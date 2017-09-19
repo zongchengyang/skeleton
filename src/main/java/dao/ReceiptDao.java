@@ -34,8 +34,20 @@ public class ReceiptDao {
         return receiptsRecord.getId();
     }
 
-    public List<ReceiptsRecord> getAllReceipts() {
-        return dsl.selectFrom(RECEIPTS).fetch();
+    public List<ReceiptResponse> getAllReceipts() {
+        List<ReceiptsRecord> records = dsl.selectFrom(RECEIPTS).fetch();
+        ArrayList<ReceiptResponse> responses = new ArrayList<>();
+        for (ReceiptsRecord record : records) {
+            ArrayList<String> tags = new ArrayList<>();
+            for (String tag : hm.keySet()){
+                if(hm.get(tag).contains(record.getId()))
+                    tags.add(tag);
+            }
+            ReceiptResponse response = new ReceiptResponse(record);
+            response.setTags(tags);
+            responses.add(response);
+        }
+        return responses;
     }
 
     public void insert(String tagName, int id){
